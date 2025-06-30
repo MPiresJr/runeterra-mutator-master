@@ -22,26 +22,8 @@ export interface Mutator {
 }
 
 const MutatorsDatabase = () => {
-  const [mutators, setMutators] = useState<Mutator[]>([
-    {
-      id: "1",
-      name: "Adaptive Evolution",
-      rarity: "Epic",
-      description: "All units gain +1|+1 whenever they survive damage.",
-      goodChampions: "Braum, Tahm Kench, Nautilus",
-      badChampions: "Elise, Zed, Katarina",
-      strategy: "Focus on high-health units that can tank damage and grow stronger. Avoid aggressive low-health strategies."
-    },
-    {
-      id: "2", 
-      name: "Mana Overflow",
-      rarity: "Rare",
-      description: "Start each round with +2 spell mana.",
-      goodChampions: "Karma, Ezreal, Heimerdinger",
-      badChampions: "Garen, Darius, Tryndamere",
-      strategy: "Build spell-heavy decks and focus on cheap spells to maximize the extra mana advantage."
-    }
-  ]);
+  // Clear existing mutators - starting with empty array
+  const [mutators, setMutators] = useState<Mutator[]>([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRarity, setSelectedRarity] = useState<string>("All");
@@ -109,16 +91,25 @@ const MutatorsDatabase = () => {
         console.log('Excel data:', jsonData);
 
         const importedMutators: Mutator[] = jsonData.map((row: any, index: number) => {
-          // Handle different possible column names
-          const name = row.Name || row.name || row.Mutator || row.mutator || `Imported Mutator ${index + 1}`;
-          const rarity = row.Rarity || row.rarity || "Common";
-          const description = row.Description || row.description || row.Effect || row.effect || "";
-          const goodChampions = row.GoodChampions || row['Good Champions'] || row.goodChampions || row['good champions'] || "";
-          const badChampions = row.BadChampions || row['Bad Champions'] || row.badChampions || row['bad champions'] || "";
-          const strategy = row.Strategy || row.strategy || row.Tips || row.tips || "";
+          // Use the correct column names as specified
+          const name = row.Mutator_name || row['Mutator_name'] || `Imported Mutator ${index + 1}`;
+          const rarity = row.Rarity || row['Rarity'] || "Common";
+          const description = row.Mutator || row['Mutator'] || "";
+          const goodChampions = row.Good_champions || row['Good_champions'] || "";
+          const badChampions = row.Bad_champions || row['Bad_champions'] || "";
+          const strategy = row.Strategy || row['Strategy'] || "";
 
           // Validate rarity
           const validRarity = ["Common", "Rare", "Epic", "Legendary"].includes(rarity) ? rarity : "Common";
+
+          console.log('Processing row:', {
+            name,
+            rarity: validRarity,
+            description,
+            goodChampions,
+            badChampions,
+            strategy
+          });
 
           return {
             id: `imported-${Date.now()}-${index}`,
