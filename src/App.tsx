@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import MutatorsDatabase from "./pages/MutatorsDatabase";
+import Roster from "./pages/Roster";
+import Champion from "./pages/Champion";
+import MonthlyChallenge from "./pages/MonthlyChallenge";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,6 +22,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/mutators" element={<MutatorsDatabase />} />
+          <Route path="/roster" element={<Roster />} />
+          <Route path="/champion/:championName" element={<Champion />} />
+          <Route path="/monthly-challenge" element={<MonthlyChallenge />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
