@@ -1,14 +1,15 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Search, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Search, Edit, Trash2, FileSpreadsheet } from "lucide-react";
 import { AddMutatorDialog } from "@/components/mutators/AddMutatorDialog";
 import { EditMutatorDialog } from "@/components/mutators/EditMutatorDialog";
 import { toast } from "sonner";
+import * as XLSX from 'xlsx';
 
 export interface Mutator {
   id: string;
@@ -46,6 +47,7 @@ const MutatorsDatabase = () => {
   const [selectedRarity, setSelectedRarity] = useState<string>("All");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingMutator, setEditingMutator] = useState<Mutator | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const rarityColors = {
     Common: "bg-gray-500/20 text-gray-300 border-gray-500/30",
@@ -79,6 +81,78 @@ const MutatorsDatabase = () => {
   const handleDeleteMutator = (id: string) => {
     setMutators(prev => prev.filter(m => m.id !== id));
     toast.success("Mutator deleted successfully!");
+  };
+
+  const handleExcelImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        // Look for a sheet named 'Mutators' or use the first sheet
+        const sheetName = workbook.SheetNames.find(name => 
+          name.toLowerCase().includes('mutator')
+        ) || workbook.SheetNames[0];
+        
+        if (!sheetName) {
+          toast.error("No suitable sheet found in the Excel file");
+          return;
+        }
+
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        console.log('Excel data:', jsonData);
+
+        const importedMutators: Mutator[] = jsonData.map((row: any, index: number) => {
+          // Handle different possible column names
+          const name = row.Name || row.name || row.Mutator || row.mutator || `Imported Mutator ${index + 1}`;
+          const rarity = row.Rarity || row.rarity || "Common";
+          const description = row.Description || row.description || row.Effect || row.effect || "";
+          const goodChampions = row.GoodChampions || row['Good Champions'] || row.goodChampions || row['good champions'] || "";
+          const badChampions = row.BadChampions || row['Bad Champions'] || row.badChampions || row['bad champions'] || "";
+          const strategy = row.Strategy || row.strategy || row.Tips || row.tips || "";
+
+          // Validate rarity
+          const validRarity = ["Common", "Rare", "Epic", "Legendary"].includes(rarity) ? rarity : "Common";
+
+          return {
+            id: `imported-${Date.now()}-${index}`,
+            name: String(name),
+            rarity: validRarity as "Common" | "Rare" | "Epic" | "Legendary",
+            description: String(description),
+            goodChampions: String(goodChampions),
+            badChampions: String(badChampions),
+            strategy: String(strategy)
+          };
+        });
+
+        if (importedMutators.length > 0) {
+          setMutators(prev => [...prev, ...importedMutators]);
+          toast.success(`Successfully imported ${importedMutators.length} mutators!`);
+        } else {
+          toast.error("No valid mutator data found in the Excel file");
+        }
+      } catch (error) {
+        console.error('Excel import error:', error);
+        toast.error("Failed to import Excel file. Please check the file format.");
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -128,11 +202,25 @@ const MutatorsDatabase = () => {
             ))}
           </div>
 
+          <Button onClick={handleImportClick} className="bg-blue-600 hover:bg-blue-700">
+            <FileSpreadsheet className="w-4 h-4 mr-2" />
+            Import Excel
+          </Button>
+
           <Button onClick={() => setIsAddDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
             <Plus className="w-4 h-4 mr-2" />
             Add Mutator
           </Button>
         </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          onChange={handleExcelImport}
+          style={{ display: 'none' }}
+        />
 
         {/* Mutators Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
