@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mutator } from "@/pages/MutatorsDatabase";
+import { Mutator } from "@/hooks/useMutators";
 
 interface AddMutatorDialogProps {
   open: boolean;
