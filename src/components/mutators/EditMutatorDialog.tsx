@@ -12,13 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Mutator } from "@/hooks/useMutators";
 
 interface EditMutatorDialogProps {
@@ -35,6 +28,7 @@ export function EditMutatorDialog({ open, onOpenChange, mutator, onEdit }: EditM
   const [goodChampions, setGoodChampions] = useState("");
   const [badChampions, setBadChampions] = useState("");
   const [strategy, setStrategy] = useState("");
+  const [tag, setTag] = useState("");
 
   // Update form when mutator changes
   useEffect(() => {
@@ -45,6 +39,7 @@ export function EditMutatorDialog({ open, onOpenChange, mutator, onEdit }: EditM
       setGoodChampions(mutator.goodChampions);
       setBadChampions(mutator.badChampions);
       setStrategy(mutator.strategy);
+      setTag(mutator.tag || "");
     }
   }, [mutator]);
 
@@ -63,6 +58,7 @@ export function EditMutatorDialog({ open, onOpenChange, mutator, onEdit }: EditM
       goodChampions: goodChampions.trim(),
       badChampions: badChampions.trim(),
       strategy: strategy.trim(),
+      tag: tag.trim(),
     });
   };
 
@@ -90,18 +86,13 @@ export function EditMutatorDialog({ open, onOpenChange, mutator, onEdit }: EditM
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="edit-rarity">Rarity</Label>
-              <Select value={rarity} onValueChange={(value: Mutator["rarity"]) => setRarity(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Common">Common</SelectItem>
-                  <SelectItem value="Rare">Rare</SelectItem>
-                  <SelectItem value="Epic">Epic</SelectItem>
-                  <SelectItem value="Legendary">Legendary</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="edit-tag">Tag</Label>
+              <Input
+                id="edit-tag"
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+                placeholder="Enter mutator tag"
+              />
             </div>
           </div>
 

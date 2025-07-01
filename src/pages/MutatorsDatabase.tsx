@@ -20,7 +20,8 @@ const MutatorsDatabase = () => {
     handleAddMutator,
     handleEditMutator,
     handleDeleteMutator,
-    addImportedMutators
+    addImportedMutators,
+    handleTagEdit
   } = useMutators();
 
   const {
@@ -47,7 +48,7 @@ const MutatorsDatabase = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-950/20">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-[95vw] mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link to="/">
@@ -84,6 +85,7 @@ const MutatorsDatabase = () => {
               mutator={mutator}
               onEdit={handleEditClick}
               onDelete={handleDeleteMutator}
+              onTagEdit={handleTagEdit}
             />
           ))}
         </div>

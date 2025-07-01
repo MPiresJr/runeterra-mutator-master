@@ -32,6 +32,27 @@ export const useMutators = () => {
   // Save mutators to localStorage whenever mutators change
   useEffect(() => {
     localStorage.setItem('lorMutators', JSON.stringify(mutators));
+    
+    // Also update the main data store for export
+    const savedData = localStorage.getItem('lorCompanionData');
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        const exportMutators = mutators.map((mutator: Mutator) => ({
+          Mutator_name: mutator.name,
+          Rarity: mutator.rarity,
+          Mutator: mutator.description,
+          Good_champions: mutator.goodChampions,
+          Bad_champions: mutator.badChampions,
+          Strategy: mutator.strategy,
+          Mutator_tags: mutator.tag || ""
+        }));
+        data.Mutators = exportMutators;
+        localStorage.setItem('lorCompanionData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error updating export data:', error);
+      }
+    }
   }, [mutators]);
 
   const handleAddMutator = (mutator: Omit<Mutator, "id">) => {
@@ -79,11 +100,19 @@ export const useMutators = () => {
     setMutators(prev => [...prev, ...importedMutators]);
   };
 
+  const handleTagEdit = (mutatorId: string, newTag: string) => {
+    setMutators(prev => prev.map(m => 
+      m.id === mutatorId ? { ...m, tag: newTag.trim() } : m
+    ));
+    toast.success("Tag updated successfully!");
+  };
+
   return {
     mutators,
     handleAddMutator,
     handleEditMutator,
     handleDeleteMutator,
-    addImportedMutators
+    addImportedMutators,
+    handleTagEdit
   };
 };

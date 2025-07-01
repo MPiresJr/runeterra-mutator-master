@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,39 @@ const Index = () => {
           allData[sheetName] = jsonData;
         });
 
+        // Check for mutators data and process it
+        const mutatorsSheet = workbook.SheetNames.find(name => 
+          name.toLowerCase().includes('mutator')
+        );
+        
+        if (mutatorsSheet && allData[mutatorsSheet]) {
+          const mutatorsData = allData[mutatorsSheet].map((row: any, index: number) => {
+            const name = row.Mutator_name || row['Mutator_name'] || `Imported Mutator ${index + 1}`;
+            const rarity = row.Rarity || row['Rarity'] || "Common";
+            const description = row.Mutator || row['Mutator'] || "";
+            const goodChampions = row.Good_champions || row['Good_champions'] || "";
+            const badChampions = row.Bad_champions || row['Bad_champions'] || "";
+            const strategy = row.Strategy || row['Strategy'] || "";
+            const tag = row.Mutator_tags || row['Mutator_tags'] || row.Tag || row['Tag'] || "";
+
+            const validRarity = ["Common", "Rare", "Epic", "Legendary"].includes(rarity) ? rarity : "Common";
+
+            return {
+              id: `imported-${Date.now()}-${index}`,
+              name: String(name),
+              rarity: validRarity as "Common" | "Rare" | "Epic" | "Legendary",
+              description: String(description),
+              goodChampions: String(goodChampions),
+              badChampions: String(badChampions),
+              strategy: String(strategy),
+              tag: String(tag)
+            };
+          });
+
+          // Save mutators to localStorage
+          localStorage.setItem('lorMutators', JSON.stringify(mutatorsData));
+        }
+
         setImportedData(allData);
         localStorage.setItem('lorCompanionData', JSON.stringify(allData));
         toast.success(`Successfully imported data from ${workbook.SheetNames.length} sheets!`);
@@ -47,13 +81,31 @@ const Index = () => {
 
   const handleExportData = () => {
     const savedData = localStorage.getItem('lorCompanionData');
-    if (!savedData) {
+    const savedMutators = localStorage.getItem('lorMutators');
+    
+    if (!savedData && !savedMutators) {
       toast.error("No data to export. Please import an Excel file first.");
       return;
     }
 
     try {
-      const data = JSON.parse(savedData);
+      const data = savedData ? JSON.parse(savedData) : {};
+      
+      // Include mutators data in export
+      if (savedMutators) {
+        const mutatorsData = JSON.parse(savedMutators);
+        const exportMutators = mutatorsData.map((mutator: any) => ({
+          Mutator_name: mutator.name,
+          Rarity: mutator.rarity,
+          Mutator: mutator.description,
+          Good_champions: mutator.goodChampions,
+          Bad_champions: mutator.badChampions,
+          Strategy: mutator.strategy,
+          Mutator_tags: mutator.tag || ""
+        }));
+        data.Mutators = exportMutators;
+      }
+      
       const workbook = XLSX.utils.book_new();
 
       Object.keys(data).forEach(sheetName => {
@@ -83,7 +135,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-950/20">
-      <div className="container mx-auto px-4 py-12">
+      <div className="max-w-[95vw] mx-auto px-4 py-12">
         {/* Header with Auth Buttons */}
         <div className="flex justify-between items-start mb-8">
           <div className="text-center flex-1">
@@ -91,7 +143,7 @@ const Index = () => {
               Legends of Runeterra
             </h1>
             <p className="text-xl text-muted-foreground mb-2">Companion App</p>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-4xl mx-auto">
               Master your matches and monthly challenges with comprehensive mutator strategies, 
               champion databases, and powerful tracking tools.
             </p>
@@ -111,7 +163,7 @@ const Index = () => {
 
         {/* Import/Export Section */}
         <div className="mb-12">
-          <Card className="max-w-2xl mx-auto bg-gradient-to-r from-blue-500/10 to-green-500/10 border-blue-500/30">
+          <Card className="max-w-4xl mx-auto bg-gradient-to-r from-blue-500/10 to-green-500/10 border-blue-500/30">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Excel Data Management</CardTitle>
               <CardDescription className="text-lg">

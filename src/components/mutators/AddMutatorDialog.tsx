@@ -34,6 +34,7 @@ export function AddMutatorDialog({ open, onOpenChange, onAdd }: AddMutatorDialog
   const [goodChampions, setGoodChampions] = useState("");
   const [badChampions, setBadChampions] = useState("");
   const [strategy, setStrategy] = useState("");
+  const [tag, setTag] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +50,7 @@ export function AddMutatorDialog({ open, onOpenChange, onAdd }: AddMutatorDialog
       goodChampions: goodChampions.trim(),
       badChampions: badChampions.trim(),
       strategy: strategy.trim(),
+      tag: tag.trim(),
     });
 
     // Reset form
@@ -58,6 +60,7 @@ export function AddMutatorDialog({ open, onOpenChange, onAdd }: AddMutatorDialog
     setGoodChampions("");
     setBadChampions("");
     setStrategy("");
+    setTag("");
     onOpenChange(false);
   };
 
@@ -85,18 +88,13 @@ export function AddMutatorDialog({ open, onOpenChange, onAdd }: AddMutatorDialog
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="rarity">Rarity</Label>
-              <Select value={rarity} onValueChange={(value: Mutator["rarity"]) => setRarity(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Common">Common</SelectItem>
-                  <SelectItem value="Rare">Rare</SelectItem>
-                  <SelectItem value="Epic">Epic</SelectItem>
-                  <SelectItem value="Legendary">Legendary</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="tag">Tag</Label>
+              <Input
+                id="tag"
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+                placeholder="Enter mutator tag"
+              />
             </div>
           </div>
 

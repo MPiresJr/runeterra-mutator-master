@@ -72,6 +72,34 @@ const Roster = () => {
     return stars;
   };
 
+  const handleStarClick = (champion: Champion, starLevel: number) => {
+    const updatedChampions = champions.map(c => {
+      if (c.Champion_name === champion.Champion_name) {
+        const updated = { ...c };
+        // Reset all star powers
+        for (let i = 1; i <= 6; i++) {
+          updated[`Star_power_${i}`] = i <= starLevel;
+        }
+        return updated;
+      }
+      return c;
+    });
+    
+    setChampions(updatedChampions);
+    
+    // Update localStorage
+    const savedData = localStorage.getItem('lorCompanionData');
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        data.Roster = updatedChampions;
+        localStorage.setItem('lorCompanionData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error saving champion data:', error);
+      }
+    }
+  };
+
   const handleStarToggle = (star: number) => {
     setSelectedStars(prev => {
       if (prev.includes(star)) {
@@ -132,7 +160,7 @@ const Roster = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-blue-950/20">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-[95vw] mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link to="/">
@@ -193,7 +221,7 @@ const Roster = () => {
         </div>
 
         {/* Champions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
           {filteredChampions.map((champion) => (
             <Card 
               key={champion.Champion_name}
@@ -220,26 +248,36 @@ const Roster = () => {
               <CardContent>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Level {champion.Champion_level}</span>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5, 6].map((star) => (
+                </div>
+                <div className="flex items-center justify-center gap-1 mb-2">
+                  {[1, 2, 3, 4, 5, 6].map((star) => (
+                    <Button
+                      key={star}
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-yellow-500/20"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStarClick(champion, star);
+                      }}
+                    >
                       <Star
-                        key={star}
-                        className={`w-3 h-3 ${
+                        className={`w-4 h-4 ${
                           champion[`Star_power_${star}`] 
                             ? "fill-yellow-400 text-yellow-400" 
-                            : "text-gray-600"
+                            : "text-gray-600 hover:text-yellow-400"
                         }`}
                       />
-                    ))}
-                  </div>
+                    </Button>
+                  ))}
                 </div>
                 {champion.Fragments && (
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground text-center">
                     Fragments: {champion.Fragments}
                   </div>
                 )}
                 {!champion.Unlocked && (
-                  <div className="text-xs text-red-400 font-medium mt-1">
+                  <div className="text-xs text-red-400 font-medium mt-1 text-center">
                     🔒 Locked
                   </div>
                 )}
