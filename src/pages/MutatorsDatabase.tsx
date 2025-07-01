@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Search, Edit, Trash2, FileSpreadsheet, Zap } from "lucide-react";
+import { ArrowLeft, Plus, Search, Edit, Trash2, FileSpreadsheet, Zap, Tag } from "lucide-react";
 import { AddMutatorDialog } from "@/components/mutators/AddMutatorDialog";
 import { EditMutatorDialog } from "@/components/mutators/EditMutatorDialog";
 import { ChampionPill } from "@/components/mutators/ChampionPill";
@@ -19,14 +20,12 @@ export interface Mutator {
   goodChampions: string;
   badChampions: string;
   strategy: string;
+  tag?: string;
 }
 
 const MutatorsDatabase = () => {
-  // Clear existing mutators - starting with empty array
   const [mutators, setMutators] = useState<Mutator[]>([]);
-
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRarity, setSelectedRarity] = useState<string>("All");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingMutator, setEditingMutator] = useState<Mutator | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,11 +53,29 @@ const MutatorsDatabase = () => {
     }
   };
 
+  // Load mutators from localStorage on component mount
+  useEffect(() => {
+    const savedMutators = localStorage.getItem('lorMutators');
+    if (savedMutators) {
+      try {
+        const parsedMutators = JSON.parse(savedMutators);
+        setMutators(parsedMutators);
+      } catch (error) {
+        console.error('Error loading mutators:', error);
+      }
+    }
+  }, []);
+
+  // Save mutators to localStorage whenever mutators change
+  useEffect(() => {
+    localStorage.setItem('lorMutators', JSON.stringify(mutators));
+  }, [mutators]);
+
   const filteredMutators = mutators.filter(mutator => {
     const matchesSearch = mutator.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         mutator.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRarity = selectedRarity === "All" || mutator.rarity === selectedRarity;
-    return matchesSearch && matchesRarity;
+                         mutator.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (mutator.tag && mutator.tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesSearch;
   });
 
   const handleAddMutator = (mutator: Omit<Mutator, "id">) => {
@@ -66,6 +83,28 @@ const MutatorsDatabase = () => {
       ...mutator,
       id: Date.now().toString()
     };
+    
+    // Auto-populate champions based on tag if tag is provided
+    if (mutator.tag) {
+      const taggedMutators = mutators.filter(m => m.tag === mutator.tag);
+      if (taggedMutators.length > 0) {
+        const allGoodChampions = new Set<string>();
+        const allBadChampions = new Set<string>();
+        
+        taggedMutators.forEach(m => {
+          if (m.goodChampions) {
+            m.goodChampions.split(/[,;]/).forEach(c => allGoodChampions.add(c.trim()));
+          }
+          if (m.badChampions) {
+            m.badChampions.split(/[,;]/).forEach(c => allBadChampions.add(c.trim()));
+          }
+        });
+        
+        newMutator.goodChampions = Array.from(allGoodChampions).join(', ');
+        newMutator.badChampions = Array.from(allBadChampions).join(', ');
+      }
+    }
+    
     setMutators(prev => [...prev, newMutator]);
     toast.success("Mutator added successfully!");
   };
@@ -114,6 +153,7 @@ const MutatorsDatabase = () => {
           const goodChampions = row.Good_champions || row['Good_champions'] || "";
           const badChampions = row.Bad_champions || row['Bad_champions'] || "";
           const strategy = row.Strategy || row['Strategy'] || "";
+          const tag = row.Tag || row['Tag'] || "";
 
           // Validate rarity
           const validRarity = ["Common", "Rare", "Epic", "Legendary"].includes(rarity) ? rarity : "Common";
@@ -124,7 +164,8 @@ const MutatorsDatabase = () => {
             description,
             goodChampions,
             badChampions,
-            strategy
+            strategy,
+            tag
           });
 
           return {
@@ -134,7 +175,8 @@ const MutatorsDatabase = () => {
             description: String(description),
             goodChampions: String(goodChampions),
             badChampions: String(badChampions),
-            strategy: String(strategy)
+            strategy: String(strategy),
+            tag: String(tag)
           };
         });
 
@@ -199,20 +241,6 @@ const MutatorsDatabase = () => {
               className="pl-10"
             />
           </div>
-          
-          <div className="flex gap-2">
-            {["All", "Common", "Rare", "Epic", "Legendary"].map((rarity) => (
-              <Button
-                key={rarity}
-                variant={selectedRarity === rarity ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedRarity(rarity)}
-                className={selectedRarity === rarity ? "bg-purple-600 hover:bg-purple-700" : ""}
-              >
-                {rarity}
-              </Button>
-            ))}
-          </div>
 
           <Button onClick={handleImportClick} className="bg-blue-600 hover:bg-blue-700">
             <FileSpreadsheet className="w-4 h-4 mr-2" />
@@ -234,8 +262,8 @@ const MutatorsDatabase = () => {
           style={{ display: 'none' }}
         />
 
-        {/* Mutators Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Mutators Grid - Updated to show 4 cards side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           {filteredMutators.map((mutator) => (
             <Card 
               key={mutator.id} 
@@ -244,18 +272,26 @@ const MutatorsDatabase = () => {
               {/* Rarity indicator */}
               <div className={`absolute top-0 left-0 w-full h-1 ${rarityColors[mutator.rarity].badge}`} />
               
-              <CardHeader className="relative">
+              <CardHeader className="relative pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Zap className={`w-5 h-5 ${rarityColors[mutator.rarity].title}`} />
-                      <CardTitle className={`text-xl ${rarityColors[mutator.rarity].title}`}>
+                      <Zap className={`w-4 h-4 ${rarityColors[mutator.rarity].title}`} />
+                      <CardTitle className={`text-lg ${rarityColors[mutator.rarity].title}`}>
                         {mutator.name}
                       </CardTitle>
                     </div>
-                    <Badge className={rarityColors[mutator.rarity].badge}>
-                      {mutator.rarity}
-                    </Badge>
+                    <div className="flex gap-2 flex-wrap">
+                      <Badge className={rarityColors[mutator.rarity].badge}>
+                        {mutator.rarity}
+                      </Badge>
+                      {mutator.tag && (
+                        <Badge className="bg-gray-500/20 text-gray-300 border-gray-500/30">
+                          <Tag className="w-3 h-3 mr-1" />
+                          {mutator.tag}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-1">
                     <Button
@@ -276,42 +312,42 @@ const MutatorsDatabase = () => {
                     </Button>
                   </div>
                 </div>
-                <CardDescription className="text-sm leading-relaxed mt-3 p-3 bg-muted/30 rounded-lg">
+                <CardDescription className="text-xs leading-relaxed mt-2 p-2 bg-muted/30 rounded-lg">
                   {mutator.description}
                 </CardDescription>
               </CardHeader>
               
-              <CardContent className="space-y-5">
-                <div className="bg-green-500/5 p-4 rounded-lg border border-green-500/20">
-                  <h4 className="font-semibold text-green-400 mb-2 flex items-center gap-2">
+              <CardContent className="space-y-4 pt-0">
+                <div className="bg-green-500/5 p-3 rounded-lg border border-green-500/20">
+                  <h4 className="font-semibold text-green-400 mb-2 flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                     Good Champions
                   </h4>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1">
                     {parseChampions(mutator.goodChampions).map((champion, index) => (
                       <ChampionPill key={index} championName={champion} type="good" />
                     ))}
                   </div>
                 </div>
                 
-                <div className="bg-red-500/5 p-4 rounded-lg border border-red-500/20">
-                  <h4 className="font-semibold text-red-400 mb-2 flex items-center gap-2">
+                <div className="bg-red-500/5 p-3 rounded-lg border border-red-500/20">
+                  <h4 className="font-semibold text-red-400 mb-2 flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 bg-red-400 rounded-full"></span>
                     Avoid Champions
                   </h4>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1">
                     {parseChampions(mutator.badChampions).map((champion, index) => (
                       <ChampionPill key={index} championName={champion} type="bad" />
                     ))}
                   </div>
                 </div>
                 
-                <div className="bg-purple-500/5 p-4 rounded-lg border border-purple-500/20">
-                  <h4 className="font-semibold text-purple-400 mb-2 flex items-center gap-2">
+                <div className="bg-purple-500/5 p-3 rounded-lg border border-purple-500/20">
+                  <h4 className="font-semibold text-purple-400 mb-2 flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
                     Strategy
                   </h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{mutator.strategy}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{mutator.strategy}</p>
                 </div>
               </CardContent>
             </Card>

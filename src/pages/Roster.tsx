@@ -30,7 +30,7 @@ const Roster = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState<string>("All");
   const [selectedLevel, setSelectedLevel] = useState<number>(0);
-  const [selectedStars, setSelectedStars] = useState<number>(0);
+  const [selectedStars, setSelectedStars] = useState<number[]>([]);
 
   const regionColors = {
     "Ionia": "bg-pink-500/20 text-pink-300 border-pink-500/30",
@@ -72,6 +72,16 @@ const Roster = () => {
     return stars;
   };
 
+  const handleStarToggle = (star: number) => {
+    setSelectedStars(prev => {
+      if (prev.includes(star)) {
+        return prev.filter(s => s !== star);
+      } else {
+        return [...prev, star];
+      }
+    });
+  };
+
   const filteredChampions = champions.filter(champion => {
     const matchesSearch = champion.Champion_name.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -82,7 +92,7 @@ const Roster = () => {
     const matchesLevel = selectedLevel === 0 || champion.Champion_level >= selectedLevel;
     
     const championStars = getChampionStars(champion);
-    const matchesStars = selectedStars === 0 || championStars >= selectedStars;
+    const matchesStars = selectedStars.length === 0 || selectedStars.includes(championStars);
     
     return matchesSearch && matchesRegion && matchesLevel && matchesStars;
   });
@@ -93,19 +103,29 @@ const Roster = () => {
 
   const renderStarMeter = () => {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-wrap">
         <span className="text-sm font-medium mr-2">Stars:</span>
-        {[0, 1, 2, 3, 4, 5, 6].map((star) => (
+        {[1, 2, 3, 4, 5, 6].map((star) => (
           <Button
             key={star}
-            variant={selectedStars === star ? "default" : "outline"}
+            variant={selectedStars.includes(star) ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedStars(star)}
-            className={`w-8 h-8 p-0 ${selectedStars === star ? "bg-yellow-600 hover:bg-yellow-700" : ""}`}
+            onClick={() => handleStarToggle(star)}
+            className={`w-8 h-8 p-0 ${selectedStars.includes(star) ? "bg-yellow-600 hover:bg-yellow-700" : ""}`}
           >
-            {star === 0 ? "All" : star}
+            {star}
           </Button>
         ))}
+        {selectedStars.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSelectedStars([])}
+            className="ml-2"
+          >
+            Clear
+          </Button>
+        )}
       </div>
     );
   };
@@ -167,7 +187,7 @@ const Roster = () => {
             </SelectContent>
           </Select>
 
-          <div className="md:col-span-2 lg:col-span-1">
+          <div className="md:col-span-1">
             {renderStarMeter()}
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +73,14 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
+  const handleLogin = () => {
+    toast.info("Login functionality coming soon! Please connect to Supabase for authentication.");
+  };
+
+  const handleRegister = () => {
+    toast.info("Register functionality coming soon! Please connect to Supabase for authentication.");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-950/20">
       <div className="container mx-auto px-4 py-12">
@@ -91,11 +98,11 @@ const Index = () => {
           </div>
           
           <div className="flex gap-2">
-            <Button variant="outline" className="border-blue-500/50 hover:bg-blue-500/10">
+            <Button variant="outline" className="border-blue-500/50 hover:bg-blue-500/10" onClick={handleLogin}>
               <LogIn className="w-4 h-4 mr-2" />
               Login
             </Button>
-            <Button variant="outline" className="border-green-500/50 hover:bg-green-500/10">
+            <Button variant="outline" className="border-green-500/50 hover:bg-green-500/10" onClick={handleRegister}>
               <UserPlus className="w-4 h-4 mr-2" />
               Register
             </Button>
