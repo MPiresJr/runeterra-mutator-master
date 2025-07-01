@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { MutatorControls } from "@/components/mutators/MutatorControls";
 import { MutatorCard } from "@/components/mutators/MutatorCard";
 import { useMutators, Mutator } from "@/hooks/useMutators";
 import { useExcelImport } from "@/hooks/useExcelImport";
+import { GlobalHeader } from "@/components/GlobalHeader";
 
 const MutatorsDatabase = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,7 +48,8 @@ const MutatorsDatabase = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-950/20">
-      <div className="max-w-[95vw] mx-auto px-4 py-8">
+      <GlobalHeader />
+      <div className="max-w-[95vw] mx-auto px-4 py-8 pt-20">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link to="/">

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, Star } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { GlobalHeader } from "@/components/GlobalHeader";
 
 export interface Champion {
   Champion_name: string;
@@ -72,34 +73,6 @@ const Roster = () => {
     return stars;
   };
 
-  const handleStarClick = (champion: Champion, starLevel: number) => {
-    const updatedChampions = champions.map(c => {
-      if (c.Champion_name === champion.Champion_name) {
-        const updated = { ...c };
-        // Reset all star powers
-        for (let i = 1; i <= 6; i++) {
-          updated[`Star_power_${i}`] = i <= starLevel;
-        }
-        return updated;
-      }
-      return c;
-    });
-    
-    setChampions(updatedChampions);
-    
-    // Update localStorage
-    const savedData = localStorage.getItem('lorCompanionData');
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        data.Roster = updatedChampions;
-        localStorage.setItem('lorCompanionData', JSON.stringify(data));
-      } catch (error) {
-        console.error('Error saving champion data:', error);
-      }
-    }
-  };
-
   const handleStarToggle = (star: number) => {
     setSelectedStars(prev => {
       if (prev.includes(star)) {
@@ -133,7 +106,7 @@ const Roster = () => {
     return (
       <div className="flex items-center gap-1 flex-wrap">
         <span className="text-sm font-medium mr-2">Stars:</span>
-        {[1, 2, 3, 4, 5, 6].map((star) => (
+        {[0, 1, 2, 3, 4, 5, 6].map((star) => (
           <Button
             key={star}
             variant={selectedStars.includes(star) ? "default" : "outline"}
@@ -141,7 +114,11 @@ const Roster = () => {
             onClick={() => handleStarToggle(star)}
             className={`w-8 h-8 p-0 ${selectedStars.includes(star) ? "bg-yellow-600 hover:bg-yellow-700" : ""}`}
           >
-            {star}
+            {star === 0 ? (
+              <Star className="w-4 h-4 text-gray-600" />
+            ) : (
+              star
+            )}
           </Button>
         ))}
         {selectedStars.length > 0 && (
@@ -160,7 +137,8 @@ const Roster = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-blue-950/20">
-      <div className="max-w-[95vw] mx-auto px-4 py-8">
+      <GlobalHeader />
+      <div className="container mx-auto px-4 py-8 pt-20 max-w-none">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link to="/">
@@ -221,7 +199,7 @@ const Roster = () => {
         </div>
 
         {/* Champions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
           {filteredChampions.map((champion) => (
             <Card 
               key={champion.Champion_name}
@@ -232,43 +210,33 @@ const Roster = () => {
               }`}
               onClick={() => handleChampionClick(champion)}
             >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-center">{champion.Champion_name}</CardTitle>
-                <div className="flex justify-center gap-2 flex-wrap">
-                  <Badge className={regionColors[champion.Region as keyof typeof regionColors]}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-center">{champion.Champion_name}</CardTitle>
+                <div className="flex justify-center gap-1 flex-wrap">
+                  <Badge className={`text-xs ${regionColors[champion.Region as keyof typeof regionColors]}`}>
                     {champion.Region}
                   </Badge>
                   {champion.Region_2 && (
-                    <Badge className={regionColors[champion.Region_2 as keyof typeof regionColors]}>
+                    <Badge className={`text-xs ${regionColors[champion.Region_2 as keyof typeof regionColors]}`}>
                       {champion.Region_2}
                     </Badge>
                   )}
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Level {champion.Champion_level}</span>
+              <CardContent className="pt-0">
+                <div className="flex justify-center items-center mb-2">
+                  <span className="text-xs font-medium">Level {champion.Champion_level}</span>
                 </div>
                 <div className="flex items-center justify-center gap-1 mb-2">
                   {[1, 2, 3, 4, 5, 6].map((star) => (
-                    <Button
+                    <Star
                       key={star}
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 hover:bg-yellow-500/20"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStarClick(champion, star);
-                      }}
-                    >
-                      <Star
-                        className={`w-4 h-4 ${
-                          champion[`Star_power_${star}`] 
-                            ? "fill-yellow-400 text-yellow-400" 
-                            : "text-gray-600 hover:text-yellow-400"
-                        }`}
-                      />
-                    </Button>
+                      className={`w-3 h-3 ${
+                        champion[`Star_power_${star}`] 
+                          ? "fill-yellow-400 text-yellow-400" 
+                          : "text-gray-600"
+                      }`}
+                    />
                   ))}
                 </div>
                 {champion.Fragments && (

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { ArrowLeft, Calendar, Trophy, Target, Star, Edit, Plus, Search } from "l
 import { ChampionPill } from "@/components/mutators/ChampionPill";
 import { toast } from "sonner";
 import { Champion } from "./Roster";
+import { GlobalHeader } from "@/components/GlobalHeader";
 
 interface MonthlyStage {
   Level: number;
@@ -190,7 +190,12 @@ const MonthlyChallenge = () => {
     const commit = getCommittedChampion(selectedStage);
     if (!commit) return;
 
-    setCommits(prev => prev.filter(c => !(c.stage === selectedStage && c.championName === commit.championName)));
+    // Only remove the committed state, keep the usage count
+    setCommits(prev => prev.map(c => 
+      c.stage === selectedStage && c.championName === commit.championName
+        ? { ...c, isCommitted: false }
+        : c
+    ));
     toast.success("Champion cleared from stage.");
   };
 
@@ -284,7 +289,8 @@ const MonthlyChallenge = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-orange-950/20">
-      <div className="container mx-auto px-4 py-8">
+      <GlobalHeader />
+      <div className="container mx-auto px-4 py-8 pt-20">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link to="/">
@@ -330,30 +336,18 @@ const MonthlyChallenge = () => {
 
             {stageData && (
               <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="w-5 h-5" />
-                      Stage {selectedStage} Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="font-semibold">Difficulty:</span>
-                      {Array.from({ length: stageData.Stars }).map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      ))}
-                      <span className="text-muted-foreground">({stageData.Stars} stars)</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Boss and Miniboss side by side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {stageData.Boss && renderMutatorCard(stageData.Boss, false)}
+                  {stageData.Miniboss && renderMutatorCard(stageData.Miniboss, true)}
+                </div>
 
-                {stageData.Boss && renderMutatorCard(stageData.Boss, false)}
-                {stageData.Miniboss && renderMutatorCard(stageData.Miniboss, true)}
-                
-                {[stageData.Mutator_1, stageData.Mutator_2, stageData.Mutator_3, stageData.Mutator_4]
-                  .filter(Boolean)
-                  .map((mutator, index) => renderMutatorCard(mutator!, false))}
+                {/* Mutators in up to 4 columns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[stageData.Mutator_1, stageData.Mutator_2, stageData.Mutator_3, stageData.Mutator_4]
+                    .filter(Boolean)
+                    .map((mutator, index) => renderMutatorCard(mutator!, false))}
+                </div>
               </div>
             )}
           </div>
@@ -367,8 +361,8 @@ const MonthlyChallenge = () => {
                 <CardDescription>Choose a champion for Stage {selectedStage}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Filters */}
-                <div className="grid grid-cols-1 gap-4">
+                {/* Filters side by side */}
+                <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
@@ -390,7 +384,9 @@ const MonthlyChallenge = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
 
+                <div className="grid grid-cols-2 gap-4">
                   <Select value={selectedLevel.toString()} onValueChange={(value) => setSelectedLevel(parseInt(value))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Min Level" />
@@ -404,16 +400,20 @@ const MonthlyChallenge = () => {
                   </Select>
 
                   <div className="flex items-center gap-1 flex-wrap">
-                    <span className="text-sm font-medium mr-2">Stars:</span>
-                    {[1, 2, 3, 4, 5, 6].map((star) => (
+                    <span className="text-xs font-medium mr-1">Stars:</span>
+                    {[0, 1, 2, 3, 4, 5, 6].map((star) => (
                       <Button
                         key={star}
                         variant={selectedStars.includes(star) ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleStarToggle(star)}
-                        className={`w-8 h-8 p-0 ${selectedStars.includes(star) ? "bg-yellow-600 hover:bg-yellow-700" : ""}`}
+                        className={`w-6 h-6 p-0 text-xs ${selectedStars.includes(star) ? "bg-yellow-600 hover:bg-yellow-700" : ""}`}
                       >
-                        {star}
+                        {star === 0 ? (
+                          <Star className="w-3 h-3 text-gray-600" />
+                        ) : (
+                          star
+                        )}
                       </Button>
                     ))}
                     {selectedStars.length > 0 && (
@@ -421,7 +421,7 @@ const MonthlyChallenge = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedStars([])}
-                        className="ml-2"
+                        className="ml-1 text-xs"
                       >
                         Clear
                       </Button>

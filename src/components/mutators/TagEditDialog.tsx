@@ -28,6 +28,7 @@ export function TagEditDialog({
   tagData, 
   onSave 
 }: TagEditDialogProps) {
+  const [newTagName, setNewTagName] = useState("");
   const [goodChampions, setGoodChampions] = useState("");
   const [badChampions, setBadChampions] = useState("");
 
@@ -35,31 +36,56 @@ export function TagEditDialog({
     if (tagData) {
       setGoodChampions(tagData.goodChampions || "");
       setBadChampions(tagData.badChampions || "");
+    } else {
+      setGoodChampions("");
+      setBadChampions("");
     }
-  }, [tagData]);
+    setNewTagName(tagName);
+  }, [tagData, tagName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    onSave(tagName, {
+    const finalTagName = newTagName.trim() || tagName;
+    if (!finalTagName) return;
+    
+    onSave(finalTagName, {
       goodChampions: goodChampions.trim(),
       badChampions: badChampions.trim()
     });
     
+    setNewTagName("");
+    setGoodChampions("");
+    setBadChampions("");
     onOpenChange(false);
   };
+
+  const isNewTag = !tagName;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit Tag: {tagName}</DialogTitle>
+          <DialogTitle>{isNewTag ? "Add New Tag" : `Edit Tag: ${tagName}`}</DialogTitle>
           <DialogDescription>
-            Set default champion recommendations for this tag.
+            {isNewTag ? "Create a new tag with champion recommendations." : "Set default champion recommendations for this tag."}
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {isNewTag && (
+            <div className="space-y-2">
+              <Label htmlFor="tag-name">Tag Name *</Label>
+              <Input
+                id="tag-name"
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="Enter tag name"
+                required
+              />
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="tag-good-champions">Good Champions</Label>
             <Input
@@ -85,7 +111,7 @@ export function TagEditDialog({
               Cancel
             </Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              Save Tag Data
+              {isNewTag ? "Add Tag" : "Save Tag Data"}
             </Button>
           </DialogFooter>
         </form>
