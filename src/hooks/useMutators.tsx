@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useTags } from "./useTags";
 
 export interface Mutator {
   id: string;
@@ -15,6 +15,7 @@ export interface Mutator {
 
 export const useMutators = () => {
   const [mutators, setMutators] = useState<Mutator[]>([]);
+  const { getTagData } = useTags();
 
   // Load mutators from localStorage on component mount
   useEffect(() => {
@@ -61,25 +62,37 @@ export const useMutators = () => {
       id: Date.now().toString()
     };
     
-    // Auto-populate champions based on tag if tag is provided
-    if (mutator.tag) {
-      const taggedMutators = mutators.filter(m => m.tag === mutator.tag);
-      if (taggedMutators.length > 0) {
-        const allGoodChampions = new Set<string>();
-        const allBadChampions = new Set<string>();
-        
-        taggedMutators.forEach(m => {
-          if (m.goodChampions) {
-            m.goodChampions.split(/[,;]/).forEach(c => allGoodChampions.add(c.trim()));
-          }
-          if (m.badChampions) {
-            m.badChampions.split(/[,;]/).forEach(c => allBadChampions.add(c.trim()));
-          }
-        });
-        
-        newMutator.goodChampions = Array.from(allGoodChampions).join(', ');
-        newMutator.badChampions = Array.from(allBadChampions).join(', ');
+    // Parse tags separated by commas and semicolons
+    const tags = mutator.tag ? mutator.tag.split(/[,;]/).map(t => t.trim()).filter(Boolean) : [];
+    
+    // Auto-populate champions based on tag data if tag is provided
+    if (tags.length > 0) {
+      const allGoodChampions = new Set<string>();
+      const allBadChampions = new Set<string>();
+      
+      // Add existing champions from mutator
+      if (mutator.goodChampions) {
+        mutator.goodChampions.split(/[,;]/).forEach(c => allGoodChampions.add(c.trim()));
       }
+      if (mutator.badChampions) {
+        mutator.badChampions.split(/[,;]/).forEach(c => allBadChampions.add(c.trim()));
+      }
+      
+      // Add champions from tag data
+      tags.forEach(tag => {
+        const tagData = getTagData(tag);
+        if (tagData) {
+          if (tagData.goodChampions) {
+            tagData.goodChampions.split(/[,;]/).forEach(c => allGoodChampions.add(c.trim()));
+          }
+          if (tagData.badChampions) {
+            tagData.badChampions.split(/[,;]/).forEach(c => allBadChampions.add(c.trim()));
+          }
+        }
+      });
+      
+      newMutator.goodChampions = Array.from(allGoodChampions).join(', ');
+      newMutator.badChampions = Array.from(allBadChampions).join(', ');
     }
     
     setMutators(prev => [...prev, newMutator]);
@@ -100,19 +113,11 @@ export const useMutators = () => {
     setMutators(prev => [...prev, ...importedMutators]);
   };
 
-  const handleTagEdit = (mutatorId: string, newTag: string) => {
-    setMutators(prev => prev.map(m => 
-      m.id === mutatorId ? { ...m, tag: newTag.trim() } : m
-    ));
-    toast.success("Tag updated successfully!");
-  };
-
   return {
     mutators,
     handleAddMutator,
     handleEditMutator,
     handleDeleteMutator,
-    addImportedMutators,
-    handleTagEdit
+    addImportedMutators
   };
 };

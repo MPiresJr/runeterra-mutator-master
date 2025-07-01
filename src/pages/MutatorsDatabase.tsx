@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,8 +19,7 @@ const MutatorsDatabase = () => {
     handleAddMutator,
     handleEditMutator,
     handleDeleteMutator,
-    addImportedMutators,
-    handleTagEdit
+    addImportedMutators
   } = useMutators();
 
   const {
@@ -85,7 +83,6 @@ const MutatorsDatabase = () => {
               mutator={mutator}
               onEdit={handleEditClick}
               onDelete={handleDeleteMutator}
-              onTagEdit={handleTagEdit}
             />
           ))}
         </div>

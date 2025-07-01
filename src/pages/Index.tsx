@@ -6,10 +6,12 @@ import { Shield, Database, Calendar, FileSpreadsheet, Download, Upload, LogIn, U
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import * as XLSX from 'xlsx';
+import { ClearDataButton } from "@/components/ClearDataButton";
+import { useUnifiedDatabase } from "@/hooks/useUnifiedDatabase";
 
 const Index = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [importedData, setImportedData] = useState<any>(null);
+  const { clearAllData } = useUnifiedDatabase();
 
   const handleExcelImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -30,42 +32,44 @@ const Index = () => {
           allData[sheetName] = jsonData;
         });
 
-        // Check for mutators data and process it
+        // Process mutators if present
         const mutatorsSheet = workbook.SheetNames.find(name => 
           name.toLowerCase().includes('mutator')
         );
         
         if (mutatorsSheet && allData[mutatorsSheet]) {
           const mutatorsData = allData[mutatorsSheet].map((row: any, index: number) => {
-            const name = row.Mutator_name || row['Mutator_name'] || `Imported Mutator ${index + 1}`;
-            const rarity = row.Rarity || row['Rarity'] || "Common";
-            const description = row.Mutator || row['Mutator'] || "";
-            const goodChampions = row.Good_champions || row['Good_champions'] || "";
-            const badChampions = row.Bad_champions || row['Bad_champions'] || "";
-            const strategy = row.Strategy || row['Strategy'] || "";
-            const tag = row.Mutator_tags || row['Mutator_tags'] || row.Tag || row['Tag'] || "";
+            const name = String(row.Mutator_name || row['Mutator_name'] || `Imported Mutator ${index + 1}`);
+            const rarity = String(row.Rarity || row['Rarity'] || "Common");
+            const description = String(row.Mutator || row['Mutator'] || "");
+            const goodChampions = String(row.Good_champions || row['Good_champions'] || "");
+            const badChampions = String(row.Bad_champions || row['Bad_champions'] || "");
+            const strategy = String(row.Strategy || row['Strategy'] || "");
+            const tag = String(row.Mutator_tags || row['Mutator_tags'] || row.Tag || row['Tag'] || "");
 
             const validRarity = ["Common", "Rare", "Epic", "Legendary"].includes(rarity) ? rarity : "Common";
 
             return {
               id: `imported-${Date.now()}-${index}`,
-              name: String(name),
+              name,
               rarity: validRarity as "Common" | "Rare" | "Epic" | "Legendary",
-              description: String(description),
-              goodChampions: String(goodChampions),
-              badChampions: String(badChampions),
-              strategy: String(strategy),
-              tag: String(tag)
+              description,
+              goodChampions,
+              badChampions,
+              strategy,
+              tag
             };
           });
 
-          // Save mutators to localStorage
           localStorage.setItem('lorMutators', JSON.stringify(mutatorsData));
         }
 
-        setImportedData(allData);
+        // Store all imported data
         localStorage.setItem('lorCompanionData', JSON.stringify(allData));
         toast.success(`Successfully imported data from ${workbook.SheetNames.length} sheets!`);
+        
+        // Reload to update all components
+        window.location.reload();
       } catch (error) {
         console.error('Excel import error:', error);
         toast.error("Failed to import Excel file. Please check the file format.");
@@ -82,9 +86,10 @@ const Index = () => {
   const handleExportData = () => {
     const savedData = localStorage.getItem('lorCompanionData');
     const savedMutators = localStorage.getItem('lorMutators');
+    const savedTags = localStorage.getItem('lorTags');
     
-    if (!savedData && !savedMutators) {
-      toast.error("No data to export. Please import an Excel file first.");
+    if (!savedData && !savedMutators && !savedTags) {
+      toast.error("No data to export. Please add some data first.");
       return;
     }
 
@@ -104,6 +109,17 @@ const Index = () => {
           Mutator_tags: mutator.tag || ""
         }));
         data.Mutators = exportMutators;
+      }
+      
+      // Include tags data
+      if (savedTags) {
+        const tagsData = JSON.parse(savedTags);
+        const exportTags = Object.entries(tagsData).map(([tagName, tagData]: [string, any]) => ({
+          Tag_name: tagName,
+          Good_champions: tagData.goodChampions || "",
+          Bad_champions: tagData.badChampions || ""
+        }));
+        data.Tags = exportTags;
       }
       
       const workbook = XLSX.utils.book_new();
@@ -149,12 +165,13 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="flex gap-2">
-            <Button variant="outline" className="border-blue-500/50 hover:bg-blue-500/10" onClick={handleLogin}>
+          <div className="flex gap-2 items-start">
+            <ClearDataButton onClear={clearAllData} />
+            <Button variant="outline" className="border-blue-500/50 hover:bg-blue-500/10" onClick={() => toast.info("Login functionality coming soon! Please connect to Supabase for authentication.")}>
               <LogIn className="w-4 h-4 mr-2" />
               Login
             </Button>
-            <Button variant="outline" className="border-green-500/50 hover:bg-green-500/10" onClick={handleRegister}>
+            <Button variant="outline" className="border-green-500/50 hover:bg-green-500/10" onClick={() => toast.info("Register functionality coming soon! Please connect to Supabase for authentication.")}>
               <UserPlus className="w-4 h-4 mr-2" />
               Register
             </Button>
