@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Database, Calendar, FileSpreadsheet, Palette, Sparkles, Crown } from "lucide-react";
+import { Shield, Database, Calendar, FileSpreadsheet, Palette, Sparkles, Crown, Zap, Target, Eye, Layers, Grid3x3 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 
 const Index = () => {
@@ -70,7 +70,7 @@ const Index = () => {
             Try different layouts and designs for your champion roster
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <Link to="/roster-alt1">
               <Card className="hover:bg-card/80 transition-all duration-300 border-cyan-500/20 hover:border-cyan-500/50 cursor-pointer h-full">
                 <CardHeader className="text-center">
@@ -102,6 +102,66 @@ const Index = () => {
                   <CardTitle className="text-lg">Elegant Light</CardTitle>
                   <CardDescription className="text-sm">
                     Clean, bright design with soft shadows
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt4">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-emerald-500/20 hover:border-emerald-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Target className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Corner Level</CardTitle>
+                  <CardDescription className="text-sm">
+                    Level badge in top-right with sidebar layout
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt5">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-amber-500/20 hover:border-amber-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Zap className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Center Level</CardTitle>
+                  <CardDescription className="text-sm">
+                    Compact design with centered level display
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt6">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-violet-500/20 hover:border-violet-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Eye className="w-12 h-12 text-violet-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Bottom Level</CardTitle>
+                  <CardDescription className="text-sm">
+                    Level bar at bottom with stacked buttons
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt7">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-indigo-500/20 hover:border-indigo-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Layers className="w-12 h-12 text-indigo-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Floating Level</CardTitle>
+                  <CardDescription className="text-sm">
+                    Minimalist with floating level badge
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt8">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-teal-500/20 hover:border-teal-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Grid3x3 className="w-12 h-12 text-teal-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Grid Level</CardTitle>
+                  <CardDescription className="text-sm">
+                    Level integrated in header grid layout
                   </CardDescription>
                 </CardHeader>
               </Card>
