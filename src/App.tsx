@@ -15,6 +15,11 @@ import RosterAlt5 from "./pages/RosterAlt5";
 import RosterAlt6 from "./pages/RosterAlt6";
 import RosterAlt7 from "./pages/RosterAlt7";
 import RosterAlt8 from "./pages/RosterAlt8";
+import RosterForm1 from "./pages/RosterForm1";
+import RosterForm2 from "./pages/RosterForm2";
+import RosterForm3 from "./pages/RosterForm3";
+import RosterForm4 from "./pages/RosterForm4";
+import RosterForm5 from "./pages/RosterForm5";
 import Champion from "./pages/Champion";
 import MonthlyChallenge from "./pages/MonthlyChallenge";
 import NotFound from "./pages/NotFound";
@@ -39,6 +44,11 @@ const App = () => (
           <Route path="/roster-alt6" element={<RosterAlt6 />} />
           <Route path="/roster-alt7" element={<RosterAlt7 />} />
           <Route path="/roster-alt8" element={<RosterAlt8 />} />
+          <Route path="/roster-form1" element={<RosterForm1 />} />
+          <Route path="/roster-form2" element={<RosterForm2 />} />
+          <Route path="/roster-form3" element={<RosterForm3 />} />
+          <Route path="/roster-form4" element={<RosterForm4 />} />
+          <Route path="/roster-form5" element={<RosterForm5 />} />
           <Route path="/champion/:championName" element={<Champion />} />
           <Route path="/monthly-challenge" element={<MonthlyChallenge />} />
           <Route path="*" element={<NotFound />} />

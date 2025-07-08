@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Database, Calendar, FileSpreadsheet, Palette, Sparkles, Crown, Zap, Target, Eye, Layers, Grid3x3 } from "lucide-react";
+import { Shield, Database, Calendar, FileSpreadsheet, Palette, Sparkles, Crown, Zap, Target, Eye, Layers, Grid3x3, FileText, FormInput, Skull, Moon, Crosshair, Swords } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 
 const Index = () => {
@@ -162,6 +162,78 @@ const Index = () => {
                   <CardTitle className="text-lg">Grid Level</CardTitle>
                   <CardDescription className="text-sm">
                     Level integrated in header grid layout
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          </div>
+        </div>
+
+        {/* Champion Form Layouts Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-red-400 to-amber-400 bg-clip-text text-transparent">
+            Champion Form Layouts
+          </h2>
+          <p className="text-center text-muted-foreground mb-8">
+            Dark and ominous form-based champion management interfaces
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <Link to="/roster-form1">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-red-500/20 hover:border-red-500/50 cursor-pointer h-full bg-gradient-to-b from-black/5 to-red-950/10">
+                <CardHeader className="text-center">
+                  <FileText className="w-12 h-12 text-red-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Ominous Vertical</CardTitle>
+                  <CardDescription className="text-sm">
+                    Dark vertical form with combat actions
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-form2">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-purple-500/20 hover:border-purple-500/50 cursor-pointer h-full bg-gradient-to-b from-black/5 to-purple-950/10">
+                <CardHeader className="text-center">
+                  <FormInput className="w-12 h-12 text-purple-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Split Layout</CardTitle>
+                  <CardDescription className="text-sm">
+                    Horizontal split with dark powers
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-form3">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-blue-500/20 hover:border-blue-500/50 cursor-pointer h-full bg-gradient-to-b from-black/5 to-blue-950/10">
+                <CardHeader className="text-center">
+                  <Moon className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Centered Floating</CardTitle>
+                  <CardDescription className="text-sm">
+                    Centered form with celestial powers
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-form4">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-emerald-500/20 hover:border-emerald-500/50 cursor-pointer h-full bg-gradient-to-b from-black/5 to-emerald-950/10">
+                <CardHeader className="text-center">
+                  <Crosshair className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Tactical Side</CardTitle>
+                  <CardDescription className="text-sm">
+                    Tactical form with side action panel
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-form5">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-amber-500/20 hover:border-amber-500/50 cursor-pointer h-full bg-gradient-to-b from-black/5 to-amber-950/10">
+                <CardHeader className="text-center">
+                  <Swords className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Stacked Inline</CardTitle>
+                  <CardDescription className="text-sm">
+                    Stacked form with royal powers
                   </CardDescription>
                 </CardHeader>
               </Card>
