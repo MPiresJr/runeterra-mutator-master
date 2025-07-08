@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Database, Calendar, FileSpreadsheet } from "lucide-react";
+import { Shield, Database, Calendar, FileSpreadsheet, Palette, Sparkles, Crown } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 
 const Index = () => {
@@ -59,6 +59,54 @@ const Index = () => {
               </CardHeader>
             </Card>
           </Link>
+        </div>
+
+        {/* Alternative Roster Layouts Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            Alternative Roster Designs
+          </h2>
+          <p className="text-center text-muted-foreground mb-8">
+            Try different layouts and designs for your champion roster
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link to="/roster-alt1">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-cyan-500/20 hover:border-cyan-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Sparkles className="w-12 h-12 text-cyan-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Glassmorphism</CardTitle>
+                  <CardDescription className="text-sm">
+                    Modern glass-like cards with floating effects
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt2">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-pink-500/20 hover:border-pink-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Palette className="w-12 h-12 text-pink-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Neon Gaming</CardTitle>
+                  <CardDescription className="text-sm">
+                    Cyberpunk-inspired cards with holographic effects
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            <Link to="/roster-alt3">
+              <Card className="hover:bg-card/80 transition-all duration-300 border-orange-500/20 hover:border-orange-500/50 cursor-pointer h-full">
+                <CardHeader className="text-center">
+                  <Crown className="w-12 h-12 text-orange-400 mx-auto mb-3" />
+                  <CardTitle className="text-lg">Elegant Light</CardTitle>
+                  <CardDescription className="text-sm">
+                    Clean, bright design with soft shadows
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          </div>
         </div>
 
         {/* Features Section */}
