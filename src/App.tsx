@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import MutatorsDatabase from "./pages/MutatorsDatabase";
 import Roster from "./pages/Roster";
-import RosterAlt1 from "./pages/RosterAlt1";
+//import RosterAlt1 from "./pages/RosterAlt1";
 import RosterAlt2 from "./pages/RosterAlt2";
 import RosterAlt3 from "./pages/RosterAlt3";
 import RosterAlt4 from "./pages/RosterAlt4";
@@ -44,7 +44,6 @@ const App = () => (
           <Route path="/roster-alt6" element={<RosterAlt6 />} />
           <Route path="/roster-alt7" element={<RosterAlt7 />} />
           <Route path="/roster-alt8" element={<RosterAlt8 />} />
-          <Route path="/roster-form1" element={<RosterForm1 />} />
           <Route path="/roster-form2" element={<RosterForm2 />} />
           <Route path="/roster-form3" element={<RosterForm3 />} />
           <Route path="/roster-form4" element={<RosterForm4 />} />
