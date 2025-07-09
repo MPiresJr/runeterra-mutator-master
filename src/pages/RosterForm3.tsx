@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Search, Trash2, Moon, Star, Wind, Lightning } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Moon, Star, Wind, Zap } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { Champion } from "./Roster";
@@ -190,7 +189,7 @@ const RosterForm3 = () => {
                       className="w-[70px] h-[70px] rounded-full bg-gradient-to-br from-violet-900 to-black hover:from-violet-800 hover:to-gray-900 text-violet-100 border border-violet-600/50 shadow-xl shadow-violet-900/60 flex flex-col items-center justify-center p-0"
                       onClick={(e) => {e.stopPropagation(); console.log('Storm clicked')}}
                     >
-                      <Lightning className="w-5 h-5 mb-1" />
+                      <Zap className="w-5 h-5 mb-1" />
                       <span className="text-xs">Storm</span>
                     </Button>
                   </div>

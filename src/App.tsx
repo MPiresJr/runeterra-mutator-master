@@ -36,7 +36,6 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/mutators" element={<MutatorsDatabase />} />
           <Route path="/roster" element={<Roster />} />
-          <Route path="/roster-alt1" element={<RosterAlt1 />} />
           <Route path="/roster-alt2" element={<RosterAlt2 />} />
           <Route path="/roster-alt3" element={<RosterAlt3 />} />
           <Route path="/roster-alt4" element={<RosterAlt4 />} />
@@ -44,6 +43,7 @@ const App = () => (
           <Route path="/roster-alt6" element={<RosterAlt6 />} />
           <Route path="/roster-alt7" element={<RosterAlt7 />} />
           <Route path="/roster-alt8" element={<RosterAlt8 />} />
+          <Route path="/roster-form1" element={<RosterForm1 />} />
           <Route path="/roster-form2" element={<RosterForm2 />} />
           <Route path="/roster-form3" element={<RosterForm3 />} />
           <Route path="/roster-form4" element={<RosterForm4 />} />

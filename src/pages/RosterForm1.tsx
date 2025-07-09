@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Search, Trash2, Sword, Shield, Zap, Target, Lightning } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Sword, Shield, Zap, Target } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { Champion } from "./Roster";
